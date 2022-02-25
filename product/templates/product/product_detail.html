@@ -31,50 +31,49 @@
     
     
     <hr>
+    <form action="{% url 'add_to_cart' product.id %}" method="post">
+      {% csrf_token %}
         <div class="row">
-            <div class="item-option-select">
-                <h6>Choose Color</h6>
-                <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> Silver
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color" > Gray
-                  </label>
-                  <label class="btn btn-light active">
-                    <input type="radio" name="radio_color checked"> Gold
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> Black
-                  </label>
-                </div> 
-            </div>
+          <div class="form-group">
+            <label for="color">Select Color</label>
+            <select class="form-control" name="color" id="size" required>
+              <option value="" selected disabled>COLORS</option>
+             {% for variant in product.variation_set.colors %}
+              <option value="{{variant.variation_value}}">{{variant.variation_value | capfirst}}</option>
+
+             {% endfor %}
+            </select>
+          </div>
         </div> <!-- row.// -->
         <div class="row">
-            <div class="item-option-select">
-                <h6>Select Size</h6>
-                <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> S
-                  </label>
-                  <label class="btn btn-light active">
-                    <input type="radio" name="radio_color" checked> M
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> L
-                  </label>
-                  <label class="btn btn-light">
-                    <input type="radio" name="radio_color"> XL
-                  </label>
-                </div> 
-            </div>
+          <div class="form-group">
+            <label for="size">Select Size</label>
+            <select class="form-control" name="size" id="size" required>
+              <option value="" selected disabled>SIZES</option>
+              {% for variant in product.variation_set.sizes %}
+              <option value="{{variant.variation_value}}">{{variant.variation_value}}</option>
+
+             {% endfor %}
+            </select>
+          </div>
+          
         </div> <!-- row.// -->
         <hr>
         {% if product.stock == 0 %}
-        <a href="./product-detail.html" class="btn  btn-danger"> <span class="text">Out of stcock</span> <i class="fas fa-shopping-cart"></i></a>
+   
+         <div class="alert alert-danger" role="alert">
+           <strong>      <h2 >Out of stock</h2></strong>
+         </div>
           {% else %}
-        <a href="./product-detail.html" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+          
+          <button type="submit"  class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+             <!-- {% if exist_in_cart %}
+             <a href="#" class="btn  btn-success"> <span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+             <a href="{% url 'cart' %}" class="btn  btn-outline-primary"> <span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
+             {% else %} -->
+              <!-- {% endif %} -->
         {% endif %}
+      </form>
     </article> <!-- product-info-aside .// -->
             </main> <!-- col.// -->
         </div> <!-- row.// -->
