@@ -7,6 +7,8 @@ def counter(request):
         try:
             cart=Cart.objects.get(cart_id=_create_Cart(request))
             cartcount=cart.total_product_quantity
+            print("total_product_quantity",cart.total_product_quantity)
+            print("cartcount",cartcount)
             # cartcount=0
         except Cart.DoesNotExist:
             cartcount=0

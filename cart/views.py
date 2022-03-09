@@ -120,6 +120,7 @@ def reduce_cartitem(request,product_id,cartitem_id):
         cartitem.decrease_quantity()
         cartitem.save()
     else:
+        cartitem.decrease_quantity()
         cartitem.delete()
     return redirect('cart')
 

@@ -25,11 +25,15 @@ class CartItem(models.Model):
         self.cart.total_product_quantity+=1
     
     def decrease_quantity(self):
+        print(self.cart.total_product_quantity)
         self.quantity-=1
         self.cart.total_product_quantity-=1
+        print('decreasing',self.cart.total_product_quantity)
 
     def remove_quantity(self):
+            print(self.cart.total_product_quantity)
             self.cart.total_product_quantity=self.cart.total_product_quantity-self.quantity
+            print('removing',self.cart.total_product_quantity)
             self.quantity=0
 
     def sub_total(self):
