@@ -5,9 +5,10 @@ from django.shortcuts import redirect, render
 from django.template import context
 from django.contrib import messages,auth
 from account.models import Account
+from cart.models import Cart,CartItem
 from .forms import RegistrationForm
 from django.contrib.auth.decorators import login_required
-
+import requests
 #for email verification
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -15,7 +16,10 @@ from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+
+from cart.views import _create_Cart
 # Create your views here.
+
 
 def register(request):
     if request.method=='POST':
@@ -65,8 +69,49 @@ def login(request):
         password=request.POST['password']
         user=auth.authenticate(email=email,password=password)
         if user is not None:
+            try :
+                cart=Cart.objects.get(cart_id=_create_Cart(request))
+                is_Cart_item_exists=CartItem.objects.filter(cart= cart  ).exists()
+                if is_Cart_item_exists:
+                    cart_item=CartItem.objects.filter(cart= cart  )
+                    product_variation=[]
+                    for item in cart_item:
+                        variation=item.variations.all()
+                        product_variation.append(list(variation))
+
+                    cart_item=CartItem.objects.filter(user=user  )
+                        
+                    var_list=[]
+                    cart_item_ids=[]
+                    for item in cart_item:
+                            existing_variation=item.variations.all()
+                            var_list.append(list(existing_variation))
+                            cart_item_ids.append(item.id)
+
+                    for pv in product_variation:
+                        if pv in var_list:
+                            index=var_list.index(pv)
+                            itemid=cart_item_ids[index]
+                            item=CartItem.objects.get(id=itemid)
+                            item.user=user
+                            item.increase_quantity()
+                            item.save()
+                        else:
+                            cart_item=CartItem.objects.filter(cart=cart  )
+                            for item in cart_item:
+                                item.user=user
+                                item.save()
+              #  cart.save()
+            except:
+                pass
             auth.login(request,user)
-            return redirect('home')
+            url=request.META.get('HTTP_REFERER')
+            query=requests.utils.urlparse(url).query
+            print(query)
+            if query =='next=/cart/checkout':
+                return redirect('checkout')
+            else:
+                return redirect('home')
         else:
             messages.error(request,"invalid credentials")
             return redirect('login')
