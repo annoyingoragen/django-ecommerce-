@@ -23,7 +23,7 @@
 
       </h4>
 
-      <form action="" method="post">
+      <form action="{%url 'place_order' %}" method="post">
           {% csrf_token %}
            <div class="form-row">
                <div class="col form-group">
@@ -72,7 +72,7 @@
                          Address Line 1
                         </label>
         
-                        <input type="text" name="address1" class="form-control" required>
+                        <input type="text" name="address_line1" class="form-control" required>
                     </div>
                 </div>
 
@@ -83,7 +83,7 @@
                          Address Line 2
                         </label>
         
-                        <input type="text" name="address2" class="form-control" >
+                        <input type="text" name="address_line2" class="form-control" >
                     </div>
                 </div>
 
@@ -104,7 +104,7 @@
                         Province
                         </label>
         
-                        <input type="text" name="province" class="form-control" >
+                        <input type="text" name="state" class="form-control" >
                     </div>
 
                     <div class="col form-group">
