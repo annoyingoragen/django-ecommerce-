@@ -31,7 +31,7 @@ def store(request,category_slug=None):
    else:
       products=Product.objects.all().filter(is_available=True)
       page=request.GET.get('page')
-      paginator=Paginator(products,1)
+      paginator=Paginator(products,2)
 
       try:
         paged_products=paginator.get_page(page)

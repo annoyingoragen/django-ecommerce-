@@ -140,6 +140,7 @@
      let url="{% url 'payment' %}"
      let orderID= "{{order.order_number}}"
      let csrftoken   = '{% csrf_token %}'
+     let redirecturl="{% url 'order_complete'  %}"
     
  csrftoken=csrftoken.slice(55,119)
 
@@ -176,7 +177,7 @@ console.log(csrftoken)
             // Successful capture! For dev/demo purposes:
             console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
             const transaction = orderData.purchase_units[0].payments.captures[0];
-            alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
+            // alert(`Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`);
           
           
             senddata();
@@ -197,6 +198,10 @@ console.log(csrftoken)
 
                           }),
                         })
+                        .then(response=>response.json())
+                        .then(data=>{
+                          window.location.href=redirecturl+'?order_number='+data.order_number +'&payment_id='+data.transactionID;
+                        });
                         
             }
          

@@ -31,11 +31,11 @@ class CartItem(models.Model):
             self.cart.total_product_quantity+=1
     
     def decrease_quantity(self):
-        print(self.cart.total_product_quantity)
+        # print(self.cart.total_product_quantity)
         self.quantity-=1
         if self.cart is not None:
             self.cart.total_product_quantity-=1
-        print('decreasing',self.cart.total_product_quantity)
+        # print('decreasing',self.cart.total_product_quantity)
 
     def remove_quantity(self):
             

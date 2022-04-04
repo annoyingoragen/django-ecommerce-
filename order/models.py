@@ -21,8 +21,11 @@ class Order(models.Model):
     STATUS=(
         ('New','New'),
         ('Accepted','Accepted'),
-        ('Completed','Completed'),
         ('Cancelled','Cancelled'),
+        ('Shipped','Shipped'),
+        ('Completed','Completed'),
+        
+
     )
 
     user=models.ForeignKey(Account,on_delete=models.SET_NULL,null=True)
@@ -48,6 +51,9 @@ class Order(models.Model):
 
     def address(self):
         return f'{self.address_line1} {self.address_line2}'
+    
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
         
     def __str__(self):
         return self.first_name
@@ -57,9 +63,8 @@ class OrderDetail(models.Model):
     user=models.ForeignKey(Account,on_delete=models.CASCADE)
     Payment=models.ForeignKey(Payment,on_delete=models.SET_NULL,blank=True,null=True)
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
-    variation=models.ForeignKey(Variation,on_delete=models.CASCADE)
-    color=models.CharField(max_length=50)
-    size=models.CharField(max_length=50)
+    variation=models.ManyToManyField(Variation,blank=True)
+ 
     quantity=models.IntegerField()
     product_price=models.FloatField()
     ordered=models.BooleanField(default=False)
