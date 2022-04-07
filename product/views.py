@@ -1,15 +1,52 @@
+from email import message
+from urllib import request
+from django.shortcuts import render ,redirect
 from django.core import paginator
-from django.shortcuts import render,get_object_or_404
-from .models import Product
+from django.shortcuts import redirect, render,get_object_or_404
+from .models import Product,ReviewRating
 from category.models import category
 from cart.models import CartItem,Cart
 from cart.views import _create_Cart
 from django.core.paginator import EmptyPage,PageNotAnInteger,Paginator
 from django.db.models import Q
-
+from .forms import Reviewform
+from order.models import OrderDetail
+from django.contrib import messages
 from django.http.response import HttpResponse
 
 # Create your views here.
+def submit_review(request,product_id):
+  print("in ere")
+  url=request.META.get('HTTP_REFERER')
+  if request.method=='POST':
+    print("posy")
+    try:
+      review= ReviewRating.objects.get(user__id=request.user.id,product__id=product_id)
+      form=Reviewform(request.POST,instance=review)
+      form.save()
+      messages.success(request,'Your review has been updated')
+      return redirect(url)
+    except ReviewRating.DoesNotExist:
+      form=Reviewform(request.POST)
+      if form.is_valid():
+        print("in form")
+        reviewdata=ReviewRating()
+        reviewdata.subject=form.cleaned_data['subject']
+        reviewdata.rating=form.cleaned_data['rating']
+        reviewdata.reviewtext=form.cleaned_data['reviewtext']
+        reviewdata.ip=request.META.get('REMOTE_ADDR')
+        reviewdata.product=Product.objects.get(id=product_id)
+        reviewdata.user=request.user
+        reviewdata.save( )
+        messages.success(request,'Your review has been submitted')
+        return redirect(url)
+
+
+
+      
+
+
+
 def store(request,category_slug=None):
    categories=None
    products=None
@@ -54,11 +91,22 @@ def search(request):
   return render(request,'product\store.html')
 
 
+
+
 def productdetail(request,category_slug,product_slug):
    try:
       product=Product.objects.get(category__slug=category_slug,slug=product_slug)
       cartitem=CartItem.objects.filter(cart__cart_id=_create_Cart(request),product=product).exists()
    except Exception as e:
       raise e
+   if request.user.is_authenticated:
+     try:
+       orderedproduct=OrderDetail.objects.filter(user=request.user,product_id=product.id).exists()
+     except OrderDetail.DoesNotExist:
+       orderedproduct=None 
+   else:
+      orderedproduct=None
+   
+   reviews=ReviewRating.objects.filter(product=product,status=True)
    print(product.variation_set)
-   return render(request,'product\product_detail.html',{'product':product,'exist_in_cart':cartitem})
+   return render(request,'product\product_detail.html',{'product':product,'orderedproduct':orderedproduct,'exist_in_cart':cartitem,'reviews':reviews})
