@@ -68,7 +68,7 @@ def store(request,category_slug=None):
    else:
       products=Product.objects.all().filter(is_available=True)
       page=request.GET.get('page')
-      paginator=Paginator(products,2)
+      paginator=Paginator(products,4)
 
       try:
         paged_products=paginator.get_page(page)
@@ -85,7 +85,7 @@ def search(request):
   if 'keyword' in request.GET:
       keyword=request.GET['keyword']
       if keyword:
-        products=Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword)|Q(description__icontains=keyword))
+        products=Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword)|Q(product_name__icontains=keyword)|Q(description__icontains=keyword))
         product_count=products.count()
         return render(request,'product\store.html',{'products':products,'product_count':product_count})
   return render(request,'product\store.html')
