@@ -3,7 +3,7 @@ from urllib import request
 from django.shortcuts import render ,redirect
 from django.core import paginator
 from django.shortcuts import redirect, render,get_object_or_404
-from .models import Product,ReviewRating
+from .models import Product,ReviewRating,ProductGallery
 from category.models import category
 from cart.models import CartItem,Cart
 from cart.views import _create_Cart
@@ -108,5 +108,5 @@ def productdetail(request,category_slug,product_slug):
       orderedproduct=None
    
    reviews=ReviewRating.objects.filter(product=product,status=True)
-   print(product.variation_set)
-   return render(request,'product\product_detail.html',{'product':product,'orderedproduct':orderedproduct,'exist_in_cart':cartitem,'reviews':reviews})
+   productgallery=ProductGallery.objects.filter(product_id=product.id)
+   return render(request,'product\product_detail.html',{'product':product,'productgallery':productgallery,'orderedproduct':orderedproduct,'exist_in_cart':cartitem,'reviews':reviews})

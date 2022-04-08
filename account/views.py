@@ -1,12 +1,13 @@
 from base64 import urlsafe_b64decode
 from email.message import EmailMessage
+import profile
 from pyexpat.errors import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import context
 from django.contrib import messages,auth
-from account.models import Account
+from account.models import Account, UserProfile
 from cart.models import Cart,CartItem
-from .forms import RegistrationForm
+from .forms import RegistrationForm,UserForm,UserProfileForm
 from django.contrib.auth.decorators import login_required
 import requests
 #for email verification
@@ -16,7 +17,7 @@ from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
-
+from order.models import Order, OrderDetail
 from cart.views import _create_Cart
 # Create your views here.
 
@@ -34,8 +35,11 @@ def register(request):
 
             user=Account.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password)
             user.phone_number=phone_number
+            
             user.save()
-
+            
+            userprofile=UserProfile(user=user)
+            userprofile.save()
             current_site=get_current_site(request)
             mail_subject="Account activation"
             message=render_to_string('account/email.html',{
@@ -145,8 +149,70 @@ def activate(request,uidb64,token):
 
 @login_required(login_url='login')
 def dashboard(request):
-    return render(request,'account/dashboard.html')
+    userprofile=UserProfile.objects.get(user=request.user)
+    orders=Order.objects.filter(user=request.user,is_ordered=True)
+    return render(request,'account/dashboard.html',{'orders':orders,'userprofile':userprofile})
 
+@login_required(login_url='login')
+def my_orders(request):
+    orders=Order.objects.filter(user=request.user,is_ordered=True).order_by('-created_at')
+    return render(request,"account/my_orders.html",{'orders':orders})
+
+@login_required(login_url='login')
+def my_order_detail(request,order_id):
+    print(order_id)
+    
+    order=Order.objects.get(order_number=order_id)
+    ordered_products=OrderDetail.objects.filter(order_id=order.id)
+    subtotal=order.order_total-order.tax
+    
+    return render(request,'account/my_order_detail.html',{
+        'order_detail':ordered_products,
+        'order':order,
+        'subtotal':subtotal
+    })
+
+@login_required(login_url='login')
+def edit_profile(request):
+    userprofile=get_object_or_404(UserProfile,user=request.user)
+    if request.method=='POST':
+        user_form=UserForm(request.POST,instance=request.user)
+        profile_form=UserProfileForm (request.POST,request.FILES,instance=userprofile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request,'Your profile has been updated')
+            return redirect('edit_profile')
+    else:
+        user_form=UserForm(instance=request.user)
+        profile_form=UserProfileForm(instance=userprofile)
+        
+
+    return render(request,'account/edit_profile.html',{"user_form":user_form,'profile_form':profile_form,'userprofile':userprofile})
+
+@login_required(login_url='login')
+def changepassword(request):
+    if request.method=='POST':
+        current_password=request.POST['current_password']
+        new_password=request.POST['new_password']
+        confirm_password=request.POST['confirm_new_password']
+        user=Account.objects.get(username__exact=request.user.username)
+        if new_password==confirm_password:
+            if user.check_password(current_password):
+                user.set_password(new_password)
+                user.save()
+                messages.success(request,'Password updated successfully')
+                return redirect('changepassword')
+            else:
+                messages.error(request,'your current password didnt match with your old password')
+                return redirect('changepassword')
+        else:
+            messages.error(request,'Password does not match')
+            return redirect('changepassword')
+
+
+
+    return render(request,'account/changepassword.html')
 
 def forgotpassword(request):
     if request.method=='POST':

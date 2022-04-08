@@ -151,6 +151,16 @@
                                 <span class="price">${{product.price}}</span>
                                 
                             </div> <!-- price-wrap.// -->
+                            <div >
+                                <span>
+                                  <i class="rating-stars fa fa-star{% if product.averageReview < 0.5 %}-o{% elif product.averageReview < 1  %}-half-o{% endif %}" aria-hidden="true"></i>
+                                  <i class="rating-stars fa fa-star{% if product.averageReview < 1.5 %}-o{% elif product.averageReview < 2  %}-half-o{% endif %}" aria-hidden="true"></i>
+                                  <i class="rating-stars fa fa-star{% if product.averageReview < 2.5 %}-o{% elif product.averageReview < 3  %}-half-o{% endif %}" aria-hidden="true"></i>
+                                  <i class="rating-stars fa fa-star{% if product.averageReview < 3.5 %}-o{% elif product.averageReview < 4  %}-half-o{% endif %}" aria-hidden="true"></i>
+                                  <i class="rating-stars fa fa-star{% if product.averageReview < 4.5 %}-o{% elif product.averageReview < 5  %}-half-o{% endif %}" aria-hidden="true"></i>
+                                </span>
+                                {{product.countReview}} Reviews
+                              </div>
                         </div>
                       
                         <a href="{% url 'product_detail' product.category.slug product.slug %}" class="btn btn-block  btn-primary"> <span class="text">View Details</span> <i class=" fa fa-info"></i>  </a>

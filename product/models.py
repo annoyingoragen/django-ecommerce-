@@ -1,5 +1,8 @@
 from audioop import avg
+from distutils.command.upload import upload
+from itertools import product
 from pyexpat import model
+from tabnanny import verbose
 from turtle import update
 from django.db import models
 from account.models import Account
@@ -59,6 +62,17 @@ class Variation(models.Model):
     def __str__(self) -> str:
         return self.variation_value
 
+class ProductGallery(models.Model):
+    product=models.ForeignKey(Product,default=None,on_delete=models.CASCADE)
+    image=models.ImageField(upload_to='photos/products')
+
+    def __str__(self):
+        return self.product.product_name
+    
+    class Meta:
+        verbose_name='product gallery'
+        verbose_name_plural='product gallery'
+
 class ReviewRating(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
     user=models.ForeignKey(Account,on_delete=models.CASCADE)
@@ -72,5 +86,7 @@ class ReviewRating(models.Model):
 
     def __str__(self) :
         return self.subject
+    
+  
 
 

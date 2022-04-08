@@ -1,0 +1,70 @@
+{% extends 'kartapp/layout.html' %}
+
+{% load static %}
+
+
+{% block bodyblock %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+    <div class="container">
+        <div class="row">
+        <aside class="col-md-3">
+            <!--   SIDEBAR   -->
+           
+            {% include 'account/sidenav.html' %}
+            <br>
+            <a class="btn btn-light btn-block" href="{% url 'logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Log out</span> </a> 
+            <!--   SIDEBAR .//END   -->
+        </aside>
+        <main class="col-md-9">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">Order History:</strong>
+                <!-- <span>{{user.first_name}}</span> -->
+            </header>
+            <div class="card-body">
+                <div class="row"> 
+               
+                  
+
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <tr>
+                                                <th scope="col">Order #</th>
+                                                <th scope="col">Order status</th>
+                                                <th scope="col">Order Total</th>
+                                                <th scope="col">Date</th>
+                                            </tr>
+                                            {% for order in orders %}
+                                            <tr>
+                                                <th scope="row">
+                                                  <a href="{% url 'my_order_detail' order.order_number %}">  {{order.order_number}}</a>
+                                                </th>
+                                                <td> 
+                                                    <p class="title mb-0">{{order.status}} </p>
+                                                   
+                                                </td>
+                                                <td> {{order.order_total}} </td>
+                                                <td width="250">{{order.created_at}} </td>
+                                            </tr>
+                                          {% endfor %}
+                                      </table>
+                                      </div> <!-- table-responsive .end// -->
+                    </div>
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+ 
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+{% endblock %}
